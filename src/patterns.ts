@@ -1,0 +1,1 @@
+export const Pattern = /\<tr\>.*?\<td\>.*?\<span\s+class\=\"flagicon\"\>.*?\<img.*?src\=\"(?<flag>\/\/.+?)\"\s*.*?\/\>.*?\<\/span\>.*?\<a.*?\>(?<name>.+?)\<\/a\>.*?\<\/td\>.*?\<td\>.*?\<a.*?\<span.*?\>(?<code2>\w{2})\s*\<\/span\>.*?\<td\>.*?\<span.*?\>(?<code3>\w{3})\s*\<\/span\>.*?\<td\>.*?\<span.*?\>(?<code>\d+)\<\/span\>.*?\<td\>.*?\<td\>.*?\<\/tr\>/;

@@ -1,0 +1,5 @@
+{
+    "rootURL": "https://en.wikipedia.org/wiki/ISO_3166-1#Officially_assigned_code_elements",
+    "cachePath": "./cached/",
+    "output": "countries.json"
+}
