@@ -27,24 +27,36 @@ const get = (url: URL, callback: (response: IncomingMessage) => void): ClientReq
 
 const requestOnce = async (url: URL): Promise<RequestResult> => {
     return await new Promise(resolve => {
-        get(url, res => {
+        get(url, async res => {
             const isBinaryType = /image/.test(res.headers['content-type'] ?? '');
             if (isBinaryType) {
-                res.setEncoding('binary');
-            }
+                const binaryData = Array<Uint8Array>();
 
-            let data = '';
+                res.on('data', (trunk: Uint8Array) => {
+                    binaryData.push(trunk);
+                })
 
-            res.on('data', (trunk: String) => {
-                data += trunk;
-            })
-
-            res.on('end', () => {
-                resolve({
-                    data: data,
-                    isBinary: isBinaryType
+                res.on('end', () => {
+                    const buffer = Buffer.concat(binaryData);
+                    resolve({
+                        data: buffer.toString('base64'),
+                        isBinary: isBinaryType
+                    });
                 });
-            });
+            } else {
+                let data = '';
+
+                res.on('data', (trunk: String) => {
+                    data += trunk;
+                })
+
+                res.on('end', () => {
+                    resolve({
+                        data: data,
+                        isBinary: isBinaryType
+                    });
+                });
+            }
         }).on('error', (error: Error) => {
             console.error(error);
             resolve({
@@ -117,7 +129,7 @@ export default async function request(uri: string, config: Config, retry: number
         return cached;
     }
 
-    const wait = Math.floor(Math.random() * Math.floor(3) + 1); // wait for 1 to 10 seconds
+    const wait = Math.floor(Math.random() * Math.floor(3) + 1); // wait for 1 to 3 seconds
     console.log(`waiting for ${wait} seconds . . .`)
     await new Promise(resolve => {
         global.setTimeout(
@@ -131,11 +143,9 @@ export default async function request(uri: string, config: Config, retry: number
         return '';
     }
 
-    const data = response.isBinary
-        ? Buffer.from(response.data).toString('base64')
-        : response.data;
+    const data = response.data;
 
-    setCache(url, data, config);
+    setCache(url, response.data, config);
     console.log('cached');
 
     return data;
